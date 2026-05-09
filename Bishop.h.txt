@@ -1,0 +1,28 @@
+#ifndef BISHOP_H
+#define BISHOP_H
+
+#include "Piece.h"
+class Bishop : public Piece {
+public:
+    Bishop(char c) : Piece(c) {}
+    string getName() override { return "Bishop"; }
+    char getSymbol() override { return (color == 'W') ? 'B' : 'b'; }
+    bool isValidMove(Board* b, int sx, int sy, int dx, int dy) override;
+};
+
+class Knight : public Piece {
+public:
+    Knight(char c) : Piece(c) {}
+    string getName() override { return "Knight"; }
+    char getSymbol() override { return (color == 'W') ? 'N' : 'n'; }
+    bool isValidMove(Board* b, int sx, int sy, int dx, int dy) override;
+};
+
+class Pawn : public Piece {
+public:
+    Pawn(char c) : Piece(c) {}
+    string getName() override { return "Pawn"; }
+    char getSymbol() override { return (color == 'W') ? 'P' : 'p'; }
+    bool isValidMove(Board* b, int sx, int sy, int dx, int dy) override;
+};
+#endif
