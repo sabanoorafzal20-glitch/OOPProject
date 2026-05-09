@@ -1,0 +1,114 @@
+#include "Board.h"
+# include<iostream>
+Board::Board() {
+    for (int i = 0; i < 8; i++)
+        for (int j = 0; j < 8; j++)
+            grid[i][j] = nullptr;
+}
+
+bool Board::isInside(int x, int y) const {
+    return (x >= 0 && x < 8 && y >= 0 && y < 8);
+}
+
+bool Board::isPathClear(int sx, int sy, int dx, int dy) const {
+    int stepX = (dx == sx) ? 0 : (dx > sx ? 1 : -1);
+    int stepY = (dy == sy) ? 0 : (dy > sy ? 1 : -1);
+    int x = sx + stepX, y = sy + stepY;
+    while (x != dx || y != dy) {
+        if (grid[x][y] != nullptr) return false;
+        x += stepX; y += stepY;
+    }
+    return true;
+}
+
+void Board::setup() {
+    for (int i = 0; i < 8; i++) {
+        grid[1][i] = new Pawn('B');
+        grid[6][i] = new Pawn('W');
+    }
+    grid[0][0] = new Rook('B'); grid[0][7] = new Rook('B');
+    grid[0][1] = new Knight('B'); grid[0][6] = new Knight('B');
+    grid[0][2] = new Bishop('B'); grid[0][5] = new Bishop('B');
+    grid[0][3] = new Queen('B'); grid[0][4] = new King('B');
+
+    grid[7][0] = new Rook('W'); grid[7][7] = new Rook('W');
+    grid[7][1] = new Knight('W'); grid[7][6] = new Knight('W');
+    grid[7][2] = new Bishop('W'); grid[7][5] = new Bishop('W');
+    grid[7][3] = new Queen('W'); grid[7][4] = new King('W');
+}
+
+void Board::display() const {
+    std::cout << "\n    0   1   2   3   4   5   6   7\n  +---+---+---+---+---+---+---+---+\n";
+    for (int i = 0; i < 8; i++) {
+        std::cout << i << " |";
+        for (int j = 0; j < 8; j++) {
+            if (grid[i][j]) std::cout << " " << grid[i][j]->getSymbol() << " |";
+            else std::cout << " . |";
+        }
+        std::cout << " " << i << "\n  +---+---+---+---+---+---+---+---+\n";
+    }
+    std::cout << "    0   1   2   3   4   5   6   7\n\n";
+}
+
+bool Board::isCheck(char color) {
+    int kx = -1, ky = -1;
+    char kingSymbol = (color == 'W') ? 'K' : 'k';
+    for (int i = 0; i < 8; i++)
+        for (int j = 0; j < 8; j++)
+            if (grid[i][j] && grid[i][j]->getSymbol() == kingSymbol) { kx = i; ky = j; }
+    if (kx == -1) return false;
+    for (int i = 0; i < 8; i++)
+        for (int j = 0; j < 8; j++)
+            if (grid[i][j] && grid[i][j]->getColor() != color)
+                if (grid[i][j]->isValidMove(this, i, j, kx, ky)) return true;
+    return false;
+}
+
+bool Board::hasValidMoves(char color) {
+    for (int sx = 0; sx < 8; sx++) {
+        for (int sy = 0; sy < 8; sy++) {
+            if (!grid[sx][sy] || grid[sx][sy]->getColor() != color) continue;
+            for (int dx = 0; dx < 8; dx++) {
+                for (int dy = 0; dy < 8; dy++) {
+                    if (!grid[sx][sy]->isValidMove(this, sx, sy, dx, dy)) continue;
+                    Piece* backup = grid[dx][dy];
+                    grid[dx][dy] = grid[sx][sy];
+                    grid[sx][sy] = nullptr;
+                    bool safe = !isCheck(color);
+                    grid[sx][sy] = grid[dx][dy];
+                    grid[dx][dy] = backup;
+                    if (safe) return true;
+                }
+            }
+        }
+    }
+    return false;
+}
+
+bool Board::move(int sx, int sy, int dx, int dy, char turn) {
+    if (!isInside(sx, sy) || !isInside(dx, dy) || !grid[sx][sy] || grid[sx][sy]->getColor() != turn) return false;
+    if (!grid[sx][sy]->isValidMove(this, sx, sy, dx, dy)) return false;
+    if (grid[dx][dy] && grid[dx][dy]->getColor() == turn) return false;
+
+    Piece* captured = grid[dx][dy];
+    grid[dx][dy] = grid[sx][sy];
+    grid[sx][sy] = nullptr;
+
+    if (isCheck(turn)) {
+        grid[sx][sy] = grid[dx][dy];
+        grid[dx][dy] = captured;
+        return false;
+    }
+
+    if (grid[dx][dy]->getName() == "Pawn" && ((turn == 'W' && dx == 0) || (turn == 'B' && dx == 7))) {
+        delete grid[dx][dy];
+        grid[dx][dy] = new Queen(turn);
+        std::cout << "  ** Pawn promoted to Queen! **\n";
+    }
+
+    if (captured) {
+        std::cout << "  Captured: " << captured->getName() << "!\n";
+        delete captured;
+    }
+    return true;
+}
