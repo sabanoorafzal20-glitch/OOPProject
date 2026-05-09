@@ -1,1 +1,1 @@
-
+This project is a console-based Chess Game developed in C++ using Object-Oriented Programming concepts. The game allows two players to play chess on an 8×8 board with proper movement rules for all chess pieces including Pawn, Rook, Knight, Bishop, Queen, and King. The project demonstrates key OOP concepts such as Encapsulation, Inheritance, Polymorphism, and Composition through separate classes and structured game logic. Additional features like check, checkmate, stalemate detection, and pawn promotion are also implemented to make the game more realistic and interactive.
