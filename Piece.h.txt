@@ -1,0 +1,21 @@
+#ifndef PIECE_H
+#define PIECE_H
+
+#include <string>
+using namespace std;
+
+class Board;
+
+class Piece {
+protected:
+    char color;
+public:
+    Piece(char c) : color(c) {}
+    virtual ~Piece() {}
+    char getColor() const { return color; }
+    virtual char getSymbol() = 0;
+    virtual bool isValidMove(Board* b, int sx, int sy, int dx, int dy) = 0;
+    virtual string getName() = 0;
+};
+
+#endif
