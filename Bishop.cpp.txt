@@ -1,0 +1,27 @@
+#include "Bishop.h"
+#include "Board.h"
+#include "King.h"
+
+bool Bishop::isValidMove(Board* b, int sx, int sy, int dx, int dy) {
+    if (abs(dx - sx) == abs(dy - sy)) return b->isPathClear(sx, sy, dx, dy);
+    return false;
+}
+
+bool Knight::isValidMove(Board* b, int sx, int sy, int dx, int dy) {
+    int dr = abs(dx - sx);
+    int dc = abs(dy - sy);
+    return (dr == 2 && dc == 1) || (dr == 1 && dc == 2);
+}
+
+bool Pawn::isValidMove(Board* b, int sx, int sy, int dx, int dy) {
+    int dir = (color == 'W') ? -1 : 1;
+    if (sy == dy && b->grid[dx][dy] == nullptr) {
+        if (dx == sx + dir) return true;
+        int startRow = (color == 'W') ? 6 : 1;
+        if (sx == startRow && dx == sx + 2 * dir && b->grid[sx + dir][sy] == nullptr)
+            return true;
+    }
+    if (abs(sy - dy) == 1 && dx == sx + dir && b->grid[dx][dy] != nullptr)
+        return true;
+    return false;
+}
